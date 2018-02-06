@@ -30,7 +30,6 @@ public class Robot extends IterativeRobot {
 	private Joystick joystick = new Joystick(1);
 	private Timer m_timer = new Timer();
 	private Solenoid sole = new Solenoid(0);
-	private Compressor compressor = new Compressor(1);
 	boolean climberFlag = false;
 	JoystickButton aButton;
 	JoystickButton bButton;
@@ -82,11 +81,22 @@ public class Robot extends IterativeRobot {
 		robotDrive.arcadeDrive(Triggers, xbox.getX());
 		//robotDrive.arcadeDrive(joystick.getY(), joystick.getX());
 		
-		boolean aButton = xbox.getRawButton(1);
+		
 		boolean bButton = xbox.getRawButton(2);
 		boolean xButton = xbox.getRawButton(3);
 		boolean yButton = xbox.getRawButton(4);
 		boolean triggerJoystick = joystick.getRawButton(1);
+		
+		while(true) {
+			boolean aButton = xbox.getAButton();
+			
+			if(aButton) {
+				control.set(1.0);
+			}else {
+				control.set(0.0);
+				break;
+			}
+		}
 
 	}
 
