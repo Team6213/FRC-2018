@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -25,7 +26,9 @@ public class Robot extends IterativeRobot {
 			= new DifferentialDrive(new Spark(0), new Spark(1));
 	//private Spark motor1 = new Spark(0);
 	//private Spark motor2 = new Spark(1);
-	private Spark control = new Spark(2);
+	private Spark armMotor1 = new Spark(2);
+	private Spark armMotor2 = new Spark(3);
+	private SpeedControllerGroup armMotors = new SpeedControllerGroup(armMotor1, armMotor2);
 	private XboxController xbox = new XboxController(0);
 	private Joystick joystick = new Joystick(1);
 	private Timer m_timer = new Timer();
@@ -71,6 +74,7 @@ public class Robot extends IterativeRobot {
 
 	@Override
 	public void teleopInit() {
+		armMotor2.setInverted(true);
 	}
 
 	@Override
@@ -81,23 +85,34 @@ public class Robot extends IterativeRobot {
 		robotDrive.arcadeDrive(Triggers, xbox.getX());
 		//robotDrive.arcadeDrive(joystick.getY(), joystick.getX());
 		
-		
+		/*boolean aButton = xbox.getAButton();
 		boolean bButton = xbox.getRawButton(2);
 		boolean xButton = xbox.getRawButton(3);
 		boolean yButton = xbox.getRawButton(4);
-		boolean triggerJoystick = joystick.getRawButton(1);
+		boolean triggerJoystick = joystick.getRawButton(1);*/
 		
-		while(true) {
-			boolean aButton = xbox.getAButton();
+		
+		
+		if(xbox.getAButton()) {
+			armMotors.set(1.0);
+		}else {
+			armMotors.set(0.0);
 			
-			if(aButton) {
-				control.set(1.0);
-			}else {
-				control.set(0.0);
-				break;
-			}
+		}
+		
+		if(xbox.getBButton()) {
+			xbox.setRumble(GenericHID.RumbleType.kLeftRumble, 1.0);
+		}else {
+			xbox.setRumble(GenericHID.RumbleType.kLeftRumble, 0.0);
+		}
+		
+		if(xbox.getXButton()) {
+			xbox.setRumble(GenericHID.RumbleType.kRightRumble, 1.0);
+		}else {
+			xbox.setRumble(GenericHID.RumbleType.kRightRumble, 0.0);
 		}
 
+		
 	}
 
 	@Override
