@@ -10,9 +10,8 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Solenoid;
-import java.awt.Image;
-import javax.swing.JFrame;
 import org.opencv.videoio.VideoCapture;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
@@ -32,7 +31,7 @@ public class Robot extends IterativeRobot {
 	private XboxController xbox = new XboxController(0);
 	private Joystick joystick = new Joystick(1);
 	private Timer m_timer = new Timer();
-	private Solenoid sole = new Solenoid(0);
+	private DoubleSolenoid sole = new DoubleSolenoid(0, 1);
 	boolean climberFlag = false;
 	JoystickButton aButton;
 	JoystickButton bButton;
@@ -48,7 +47,7 @@ public class Robot extends IterativeRobot {
 		UsbCamera cam = CameraServer.getInstance().startAutomaticCapture();
 		VideoCapture vidCam = new VideoCapture(0);
 		
-		
+	
 	}
 	
 	@Override
@@ -75,10 +74,15 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void teleopInit() {
 		armMotor2.setInverted(true);
+		sole.set(DoubleSolenoid.Value.kOff);
 	}
 
 	@Override
 	public void teleopPeriodic() {
+		
+		/*
+		 * For hand motors, use (0.5/180)*axes to keep max speed at half
+		 */
 		rTrigger = xbox.getRawAxis(3);
 		lTrigger = -1*xbox.getRawAxis(2);
 		Triggers = rTrigger + lTrigger;
@@ -91,7 +95,17 @@ public class Robot extends IterativeRobot {
 		boolean yButton = xbox.getRawButton(4);
 		boolean triggerJoystick = joystick.getRawButton(1);*/
 		
+		if(joystick.getRawButton(5)) {
+			sole.set(DoubleSolenoid.Value.kForward);
+		}else {
+			sole.set(DoubleSolenoid.Value.kOff);
+		}
 		
+		if(joystick.getRawButton(6)) {
+			sole.set(DoubleSolenoid.Value.kReverse);
+		}else {
+			sole.set(DoubleSolenoid.Value.kOff);
+		}
 		
 		if(xbox.getAButton()) {
 			armMotors.set(1.0);
@@ -100,7 +114,7 @@ public class Robot extends IterativeRobot {
 			
 		}
 		
-		if(xbox.getBButton()) {
+		/*if(xbox.getBButton()) {
 			xbox.setRumble(GenericHID.RumbleType.kLeftRumble, 1.0);
 		}else {
 			xbox.setRumble(GenericHID.RumbleType.kLeftRumble, 0.0);
@@ -110,7 +124,15 @@ public class Robot extends IterativeRobot {
 			xbox.setRumble(GenericHID.RumbleType.kRightRumble, 1.0);
 		}else {
 			xbox.setRumble(GenericHID.RumbleType.kRightRumble, 0.0);
+		}*/
+		
+		if(xbox.getBButton()) {
+			armMotor1.set(1.0);
+		}else {
+			armMotor1.set(0.0);
 		}
+		
+		
 
 		
 	}
