@@ -34,6 +34,7 @@ public class Robot extends IterativeRobot {
 	private Compressor compressor = new Compressor(1);
 	private Solenoid sole1 = new Solenoid(0);
 	private Solenoid sole2 = new Solenoid(1);
+	private Solenoid testSole = new Solenoid(4);
 	//private DoubleSolenoid gripperSole = new DoubleSolenoid(0, 1);
 	//private DoubleSolenoid armSole = new DoubleSolenoid(2, 3);
 	boolean climberFlag = false;
@@ -118,7 +119,11 @@ public class Robot extends IterativeRobot {
 			}
 		}
 		
-
+		if(joystick.getRawButton(1)) {
+			testSole.set(true);
+		}else {
+			testSole.set(false);
+		}
 
 		
 		if(joystick.getRawButton(5)) {
