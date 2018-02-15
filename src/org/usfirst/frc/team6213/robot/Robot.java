@@ -28,17 +28,18 @@ import edu.wpi.first.wpilibj.CameraServer;
  * directory.
  */
 public class Robot extends IterativeRobot {
-	private DifferentialDrive m_robotDrive
-			= new DifferentialDrive(new Spark(0), new Spark(1));
-	//private Spark motor2 = new Spark(1);
-	private Spark control = new Spark(2);
-	private Joystick m_stick = new Joystick(0);
-	private Joystick joystick2 = new Joystick(1);
+//	private DifferentialDrive m_robotDrive
+//			= new DifferentialDrive(new Spark(0), new Spark(1));
+//	//private Spark motor2 = new Spark(1);
+//	private Spark control = new Spark(2);
+//	private Joystick m_stick = new Joystick(0);
+//	private Joystick joystick2 = new Joystick(1);
 	private Timer m_timer = new Timer();
-	boolean climberFlag = false;
-	JoystickButton aButton;
-	JoystickButton bButton;
-	JoystickButton triggerJoystick;
+//	boolean climberFlag = false;
+	int loops = 0;
+//	JoystickButton aButton;
+//	JoystickButton bButton;
+//	JoystickButton triggerJoystick;
 	
 	
 	/**
@@ -48,7 +49,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void robotInit() {
 		
-		UsbCamera cam = CameraServer.getInstance().startAutomaticCapture();
+		//UsbCamera cam = CameraServer.getInstance().startAutomaticCapture();
 		
 	}
 
@@ -57,8 +58,6 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousInit() {
-		m_timer.reset();
-		m_timer.start();
 	}
 
 	/**
@@ -66,12 +65,12 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousPeriodic() {
-		// Drive for 2 seconds
-		if (m_timer.get() < 2.0) {
-			m_robotDrive.arcadeDrive(0.5, 0.0); // drive forwards half speed
-		} else {
-			m_robotDrive.stopMotor(); // stop robot
-		}
+//		// Drive for 2 seconds
+//		if (m_timer.get() < 2.0) {
+//			m_robotDrive.arcadeDrive(0.5, 0.0); // drive forwards half speed
+//		} else {
+//			m_robotDrive.stopMotor(); // stop robot
+//		}
 	}
 
 	/**
@@ -79,6 +78,7 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void teleopInit() {
+		m_timer.start();
 	}
 
 	/**
@@ -86,40 +86,8 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
-		m_robotDrive.arcadeDrive(m_stick.getY(), m_stick.getX());
-		
-		boolean aButton = m_stick.getRawButton(1);
-		boolean bButton = m_stick.getRawButton(2);
-		boolean triggerJoystick = joystick2.getRawButton(1);
-		
-		/*if(aButton) {
-			if (!climberFlag) {
-				control.set(1.0);
-				climberFlag = true;
-			}
-		}else if (climberFlag){
-			control.set(0.0);
-			climberFlag = false;
-		}*/
-		
-		
-		if(triggerJoystick){
-			control.set(1.0);
-		}else {
-			control.set(0.0);
-		}
-		
-		if(aButton) {
-			control.set(1.0);
-		}else {
-			control.set(0.0);
-		}
-		
-		if(bButton) {
-			control.set(-1.0);
-		}else {
-			control.set(0.0);
-		}
+		loops++;
+		if(m_timer.get() == 1.0) {System.out.println(loops + " loops per second");}
 	}
 
 	/**
