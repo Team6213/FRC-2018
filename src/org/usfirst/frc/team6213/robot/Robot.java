@@ -30,8 +30,12 @@ public class Robot extends IterativeRobot {
 	private SpeedControllerGroup armMotors = new SpeedControllerGroup(armMotor1, armMotor2);
 	private XboxController xbox = new XboxController(0);
 	private Joystick joystick = new Joystick(1);
-	private Timer m_timer = new Timer();
-	private DoubleSolenoid sole = new DoubleSolenoid(0, 1);
+	private Timer timer = new Timer();
+	private Compressor compressor = new Compressor(1);
+	private Solenoid sole1 = new Solenoid(0);
+	private Solenoid sole2 = new Solenoid(1);
+	//private DoubleSolenoid gripperSole = new DoubleSolenoid(0, 1);
+	//private DoubleSolenoid armSole = new DoubleSolenoid(2, 3);
 	boolean climberFlag = false;
 	JoystickButton aButton;
 	JoystickButton bButton;
@@ -52,8 +56,8 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void autonomousInit() {
-		m_timer.reset();
-		m_timer.start();
+		timer.reset();
+		timer.start();
 		
 		
 		
@@ -63,7 +67,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousPeriodic() {
 		// Drive for 2 seconds
-		if (m_timer.get() < 2.0) {
+		if (timer.get() < 2.0) {
 			robotDrive.arcadeDrive(0.5, 0.0); // drive forwards half speed
 		} else {
 			robotDrive.stopMotor(); // stop robot
@@ -74,7 +78,12 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void teleopInit() {
 		armMotor2.setInverted(true);
-		sole.set(DoubleSolenoid.Value.kOff);
+		//gripperSole.set(DoubleSolenoid.Value.kOff);
+		sole1.set(false);
+		sole2.set(false);
+		sole1.setPulseDuration(0.05);
+		sole2.setPulseDuration(0.05);
+		timer.reset();
 	}
 
 	@Override
@@ -95,17 +104,53 @@ public class Robot extends IterativeRobot {
 		boolean yButton = xbox.getRawButton(4);
 		boolean triggerJoystick = joystick.getRawButton(1);*/
 		
+		
+		
+		while(joystick.getRawButton(3)) {
+			sole1.startPulse();
+			timer.start();
+			if(timer.get() == 0.05) {
+				sole2.startPulse();
+				break;
+			} else if(timer.get() > 0.05) {
+				xbox.setRumble(GenericHID.RumbleType.kLeftRumble, 1.0);
+				break;
+			}
+		}
+		
+
+
+		
 		if(joystick.getRawButton(5)) {
-			sole.set(DoubleSolenoid.Value.kForward);
-		}else {
-			sole.set(DoubleSolenoid.Value.kOff);
+			sole1.set(true);
+		} else {
+			sole1.set(false);
 		}
 		
 		if(joystick.getRawButton(6)) {
-			sole.set(DoubleSolenoid.Value.kReverse);
-		}else {
-			sole.set(DoubleSolenoid.Value.kOff);
+			sole2.set(true);
+		} else {
+			sole2.set(false);
 		}
+		
+	
+		/*if(joystick.getRawButton(5)) {
+			gripperSole.set(DoubleSolenoid.Value.kForward);
+		}else if(joystick.getRawButton(6)) {
+			gripperSole.set(DoubleSolenoid.Value.kReverse);
+		}else {
+			gripperSole.set(DoubleSolenoid.Value.kOff);
+		}
+		
+		if(joystick.getRawButton(3)) {
+			armSole.set(DoubleSolenoid.Value.kForward);
+		}else if(joystick.getRawButton(4)) {
+			armSole.set(DoubleSolenoid.Value.kReverse);
+		}else {
+			armSole.set(DoubleSolenoid.Value.kOff);
+		}*/
+		
+		
 		
 		if(xbox.getAButton()) {
 			armMotors.set(1.0);
