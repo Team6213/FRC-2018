@@ -32,11 +32,11 @@ public class Robot extends IterativeRobot {
 	private Joystick joystick = new Joystick(1);
 	private Timer timer = new Timer();
 	private Compressor compressor = new Compressor(1);
-	private Solenoid sole1 = new Solenoid(0);
-	private Solenoid sole2 = new Solenoid(1);
-	private Solenoid testSole = new Solenoid(4);
-	//private DoubleSolenoid gripperSole = new DoubleSolenoid(0, 1);
-	//private DoubleSolenoid armSole = new DoubleSolenoid(2, 3);
+	private DoubleSolenoid gripperSole = new DoubleSolenoid(0, 1);
+	private DoubleSolenoid armSole = new DoubleSolenoid(2, 3);
+	//private DoubleSolenoid gateSole = new DoubleSolenoid(4, 5);
+	private Solenoid gateSole1 = new Solenoid(4);
+	private Solenoid gateSole2 = new Solenoid(6);
 	boolean climberFlag = false;
 	JoystickButton aButton;
 	JoystickButton bButton;
@@ -80,11 +80,15 @@ public class Robot extends IterativeRobot {
 	public void teleopInit() {
 		armMotor2.setInverted(true);
 		//gripperSole.set(DoubleSolenoid.Value.kOff);
-		sole1.set(false);
-		sole2.set(false);
-		sole1.setPulseDuration(0.05);
-		sole2.setPulseDuration(0.05);
-		timer.reset();
+		//sole2.set(false);
+		//sole1.setPulseDuration(0.05);
+		//sole2.setPulseDuration(0.05);
+		/*sole1.setPulseDuration(0.01);
+		sole2.setPulseDuration(0.001);
+		Timer.delay(1.0);
+		sole1.startPulse();
+		Timer.delay(0.01);
+		sole2.startPulse();*/
 	}
 
 	@Override
@@ -96,47 +100,68 @@ public class Robot extends IterativeRobot {
 		rTrigger = xbox.getRawAxis(3);
 		lTrigger = -1*xbox.getRawAxis(2);
 		Triggers = rTrigger + lTrigger;
-		robotDrive.arcadeDrive(Triggers, xbox.getX());
-		//robotDrive.arcadeDrive(joystick.getY(), joystick.getX());
+		robotDrive.arcadeDrive(Triggers, xbox.getRawAxis(0));
 		
-		/*boolean aButton = xbox.getAButton();
-		boolean bButton = xbox.getRawButton(2);
-		boolean xButton = xbox.getRawButton(3);
-		boolean yButton = xbox.getRawButton(4);
-		boolean triggerJoystick = joystick.getRawButton(1);*/
-		
-		
-		
-		while(joystick.getRawButton(3)) {
-			sole1.startPulse();
-			timer.start();
-			if(timer.get() == 0.05) {
-				sole2.startPulse();
-				break;
-			} else if(timer.get() > 0.05) {
-				xbox.setRumble(GenericHID.RumbleType.kLeftRumble, 1.0);
-				break;
+		/*if(joystick.getRawButton(1)) {
+			while(true) {
+				timer.reset();
+				timer.start();
+				gripperSole.set(DoubleSolenoid.Value.kForward);
+				Timer.delay(0.004);
+				gripperSole.set(DoubleSolenoid.Value.kReverse);
+				Timer.delay(0.004);
+				
 			}
+		}*/
+		
+		if(joystick.getRawButton(7)) {
+			gateSole1.set(true);
+			gateSole2.set(false);
+		}else if(joystick.getRawButton(8)) {
+			gateSole1.set(false);
+			gateSole2.set(true);
 		}
 		
-		if(joystick.getRawButton(1)) {
-			testSole.set(true);
+	
+		
+		if(joystick.getRawButton(5)) {
+			gripperSole.set(DoubleSolenoid.Value.kForward);
+		}else if(joystick.getRawButton(6)) {
+			gripperSole.set(DoubleSolenoid.Value.kReverse);
 		}else {
-			testSole.set(false);
+			gripperSole.set(DoubleSolenoid.Value.kOff);
+		}
+		
+	
+		if(joystick.getRawButton(3)) {
+			armSole.set(DoubleSolenoid.Value.kForward);
+		}else if(joystick.getRawButton(4)) {
+			armSole.set(DoubleSolenoid.Value.kReverse);
+		}else {
+			armSole.set(DoubleSolenoid.Value.kOff);
 		}
 
 		
-		if(joystick.getRawButton(5)) {
-			sole1.set(true);
-		} else {
-			sole1.set(false);
+
+		if(joystick.getRawButton(1)) {
+			//testSole.set(true);
+		}else {
+			//testSole.set(false);
 		}
+
+		
+//		if(joystick.getRawButton(5)) {
+//			sole1.set(true);
+//		} else {
+//			sole1.set(false);
+//		}
 		
 		if(joystick.getRawButton(6)) {
-			sole2.set(true);
+			//sole2.set(true);
 		} else {
-			sole2.set(false);
+			//sole2.set(false);
 		}
+		
 		
 	
 		/*if(joystick.getRawButton(5)) {
