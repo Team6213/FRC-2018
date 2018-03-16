@@ -25,18 +25,16 @@ public class Robot extends IterativeRobot {
 			= new DifferentialDrive(new Spark(0), new Spark(1));
 	//private Spark motor1 = new Spark(0);
 	//private Spark motor2 = new Spark(1);
-	private Spark armMotor1 = new Spark(2);
-	private Spark armMotor2 = new Spark(3);
-	private SpeedControllerGroup armMotors = new SpeedControllerGroup(armMotor1, armMotor2);
+	private Spark armWristMotor = new Spark(2);
+	//private Spark armMotor2 = new Spark(3);
+	//private SpeedControllerGroup armMotors = new SpeedControllerGroup(armMotor1, armMotor2);
 	private XboxController xbox = new XboxController(0);
 	private Joystick joystick = new Joystick(1);
 	private Timer timer = new Timer();
-	private Compressor compressor = new Compressor(1);
 	private DoubleSolenoid gripperSole = new DoubleSolenoid(0, 1);
 	private DoubleSolenoid armSole = new DoubleSolenoid(2, 3);
 	//private DoubleSolenoid gateSole = new DoubleSolenoid(4, 5);
-	private Solenoid gateSole1 = new Solenoid(4);
-	private Solenoid gateSole2 = new Solenoid(6);
+	private Solenoid gateSole = new Solenoid(4);
 	boolean climberFlag = false;
 	JoystickButton aButton;
 	JoystickButton bButton;
@@ -44,6 +42,8 @@ public class Robot extends IterativeRobot {
 	double rTrigger;
 	double lTrigger;
 	double Triggers; 
+	double armSpeed;
+	int gripButtonNumb;
 	
 	
 	@Override
@@ -78,7 +78,11 @@ public class Robot extends IterativeRobot {
 
 	@Override
 	public void teleopInit() {
-		armMotor2.setInverted(true);
+		
+		gripButtonNumb = 1;
+		gateSole.set(true);
+		
+		//armMotor2.setInverted(true);
 		//gripperSole.set(DoubleSolenoid.Value.kOff);
 		//sole2.set(false);
 		//sole1.setPulseDuration(0.05);
@@ -94,121 +98,61 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void teleopPeriodic() {
 		
-		/*
-		 * For hand motors, use (0.5/180)*axes to keep max speed at half
-		 */
+		//Drives Robot
 		rTrigger = xbox.getRawAxis(3);
 		lTrigger = -1*xbox.getRawAxis(2);
 		Triggers = rTrigger + lTrigger;
 		robotDrive.arcadeDrive(Triggers, xbox.getRawAxis(0));
 		
-		/*if(joystick.getRawButton(1)) {
-			while(true) {
-				timer.reset();
-				timer.start();
+		
+		//Controls the arm
+		if(joystick.getRawButton(11)) {
+			//gateSole.set(false);
+			armSole.set(DoubleSolenoid.Value.kForward);
+		}
+		/*}else if(joystick.getRawButton(12)) {
+			//gateSole.set(false);
+			armSole.set(DoubleSolenoid.Value.kReverse);
+		}else {
+			//gateSole.set(true);
+		}*/
+		if(joystick.getRawButton(12)) {
+			armSole.set(DoubleSolenoid.Value.kReverse);
+		}
+		
+		/*if(joystick.getY() < -50) {
+			gateSole.set(true);
+			armSole.set(DoubleSolenoid.Value.kForward);
+		}else if(joystick.getY() > 50) {
+			gateSole.set(true);
+			armSole.set(DoubleSolenoid.Value.kReverse);
+		}else {
+			gateSole.set(false);
+		}*/
+		
+		//Controls the arm wrist
+		if(joystick.getRawButton(2)){
+			armWristMotor.set(-0.7); //Moves arm wrist up
+		}else {
+			armWristMotor.set(0.0);
+		}
+		
+		//Controls the gripper
+		if(gripButtonNumb == 0) {
+			if(joystick.getRawButton(1)) {
 				gripperSole.set(DoubleSolenoid.Value.kForward);
-				Timer.delay(0.004);
-				gripperSole.set(DoubleSolenoid.Value.kReverse);
-				Timer.delay(0.004);
-				
+				gripButtonNumb = 1;
 			}
-		}*/
-		
-		if(joystick.getRawButton(7)) {
-			gateSole1.set(true);
-			gateSole2.set(false);
-		}else if(joystick.getRawButton(8)) {
-			gateSole1.set(false);
-			gateSole2.set(true);
+		}else if(gripButtonNumb == 1) {
+			if(joystick.getRawButton(1)) {
+				gripperSole.set(DoubleSolenoid.Value.kReverse);
+				gripButtonNumb = 0;
+			}
 		}
 		
-	
-		
-		if(joystick.getRawButton(5)) {
-			gripperSole.set(DoubleSolenoid.Value.kForward);
-		}else if(joystick.getRawButton(6)) {
-			gripperSole.set(DoubleSolenoid.Value.kReverse);
-		}else {
-			gripperSole.set(DoubleSolenoid.Value.kOff);
-		}
-		
-	
-		if(joystick.getRawButton(3)) {
-			armSole.set(DoubleSolenoid.Value.kForward);
-		}else if(joystick.getRawButton(4)) {
-			armSole.set(DoubleSolenoid.Value.kReverse);
-		}else {
-			armSole.set(DoubleSolenoid.Value.kOff);
-		}
 
 		
-
-		if(joystick.getRawButton(1)) {
-			//testSole.set(true);
-		}else {
-			//testSole.set(false);
-		}
-
 		
-//		if(joystick.getRawButton(5)) {
-//			sole1.set(true);
-//		} else {
-//			sole1.set(false);
-//		}
-		
-		if(joystick.getRawButton(6)) {
-			//sole2.set(true);
-		} else {
-			//sole2.set(false);
-		}
-		
-		
-	
-		/*if(joystick.getRawButton(5)) {
-			gripperSole.set(DoubleSolenoid.Value.kForward);
-		}else if(joystick.getRawButton(6)) {
-			gripperSole.set(DoubleSolenoid.Value.kReverse);
-		}else {
-			gripperSole.set(DoubleSolenoid.Value.kOff);
-		}
-		
-		if(joystick.getRawButton(3)) {
-			armSole.set(DoubleSolenoid.Value.kForward);
-		}else if(joystick.getRawButton(4)) {
-			armSole.set(DoubleSolenoid.Value.kReverse);
-		}else {
-			armSole.set(DoubleSolenoid.Value.kOff);
-		}*/
-		
-		
-		
-		if(xbox.getAButton()) {
-			armMotors.set(1.0);
-		}else {
-			armMotors.set(0.0);
-			
-		}
-		
-		/*if(xbox.getBButton()) {
-			xbox.setRumble(GenericHID.RumbleType.kLeftRumble, 1.0);
-		}else {
-			xbox.setRumble(GenericHID.RumbleType.kLeftRumble, 0.0);
-		}
-		
-		if(xbox.getXButton()) {
-			xbox.setRumble(GenericHID.RumbleType.kRightRumble, 1.0);
-		}else {
-			xbox.setRumble(GenericHID.RumbleType.kRightRumble, 0.0);
-		}*/
-		
-		if(xbox.getBButton()) {
-			armMotor1.set(1.0);
-		}else {
-			armMotor1.set(0.0);
-		}
-		
-		
-
 		
 	}
 
